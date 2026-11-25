@@ -9,24 +9,27 @@ import os
 import sys
 from pathlib import Path
 
-ENTRY = "I dropped out at the climax because the hero said 'I'll be right back' \u2014 and I know exactly how that ends."
+ENTRY = "I cut the Wi-Fi at the climax because the dog dies in this one \u2014 and I'm not sitting here while you cry into the cushions."
 
 MAX_CHARS = 200
 
 
+def validate_entry(line: str) -> str | None:
+    """Return an error message if the line breaks the gate, else None."""
+    if not line.strip():
+        return "entry is empty or whitespace only"
+    if "\n" in line or "\r" in line:
+        return "entry must be a single line"
+    if len(line) >= MAX_CHARS:
+        return "entry is %d chars, must be under %d" % (len(line), MAX_CHARS)
+    return None
+
+
 def main() -> int:
     line = ENTRY
-    if not line.strip():
-        print("error: entry is empty or whitespace only", file=sys.stderr)
-        return 1
-    if "\n" in line or "\r" in line:
-        print("error: entry must be a single line", file=sys.stderr)
-        return 1
-    if len(line) >= MAX_CHARS:
-        print(
-            "error: entry is %d chars, must be under %d" % (len(line), MAX_CHARS),
-            file=sys.stderr,
-        )
+    error = validate_entry(line)
+    if error is not None:
+        print("error: " + error, file=sys.stderr)
         return 1
     out_dir = Path(os.environ.get("MAKEFUN_OUTPUT_DIR", "/output"))
     out_dir.mkdir(parents=True, exist_ok=True)
